@@ -43,11 +43,11 @@ describe("parseRelease", () => {
 
   it("classifies every downloadable asset by OS, kind and arch", () => {
     expect(r.assets.map(({ name, os, kind, arch, size }) => ({ name, os, kind, arch, size }))).toEqual([
-      { name: "MpVFX-0.1.0-macos-arm64.dmg", os: "mac", kind: "Disk image", arch: "Apple silicon", size: 6079789 },
-      { name: "MpVFX-0.1.0-windows-x64-setup.exe", os: "windows", kind: "Installer", arch: "x64", size: 37318656 },
-      { name: "mpvfx-windows-x64-43d4bcf.zip", os: "windows", kind: "Portable zip", arch: "x64", size: 37625177 },
-      { name: "mpvfx_0.1.0+git202610192051.43d4bcf_amd64.deb", os: "linux", kind: "Debian/Ubuntu package", arch: "x64", size: 20784930 },
-      { name: "mpvfx-linux-x64-43d4bcf.tar.gz", os: "linux", kind: "Tarball", arch: "x64", size: 36251532 },
+      { name: "MpVFX-0.1.0-macos-arm64.dmg", os: "mac", kind: "Disk image (.dmg)", arch: "Apple silicon", size: 6079789 },
+      { name: "MpVFX-0.1.0-windows-x64-setup.exe", os: "windows", kind: "Installer (.exe)", arch: "x64", size: 37318656 },
+      { name: "mpvfx-windows-x64-43d4bcf.zip", os: "windows", kind: "Zip, no install", arch: "x64", size: 37625177 },
+      { name: "mpvfx_0.1.0+git202610192051.43d4bcf_amd64.deb", os: "linux", kind: "Ubuntu / Debian (.deb)", arch: "x64", size: 20784930 },
+      { name: "mpvfx-linux-x64-43d4bcf.tar.gz", os: "linux", kind: "Archive (.tar.gz)", arch: "x64", size: 36251532 },
     ]);
     expect(r.assets[0].url).toBe(`${DL}/MpVFX-0.1.0-macos-arm64.dmg`);
   });

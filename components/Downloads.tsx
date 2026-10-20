@@ -9,9 +9,9 @@ import styles from "./Downloads.module.css";
 type State = { status: "loading" } | { status: "ready"; release: Release } | { status: "error"; message: string };
 
 const COLUMNS: { os: OS; note: string }[] = [
-  { os: "mac", note: "Apple silicon · macOS 15+" },
-  { os: "windows", note: "Windows 10/11 · x64" },
-  { os: "linux", note: "x86-64 · Ubuntu 22.04+ / Debian 12+" },
+  { os: "mac", note: "Apple silicon · macOS 15 or later" },
+  { os: "windows", note: "64-bit · Windows 10 or 11" },
+  { os: "linux", note: "64-bit · .deb for Ubuntu 24.04+ / Debian 13" },
 ];
 
 function summary(release: Release): string {

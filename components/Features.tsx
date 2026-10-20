@@ -11,12 +11,12 @@ import styles from "./Features.module.css";
 type Card = { name: string; title: string; text: string; Art: ComponentType };
 
 const CARDS: Card[] = [
-  { name: "Timeline", title: "Ripple, split, undo.", text: "Move, trim, split and ripple. The undo history survives a restart.", Art: TimelineArt },
-  { name: "Colour", title: "A full grade.", text: "Colour wheels, seven curve modes, secondaries, .cube LUTs and eighteen stylize effects.", Art: ColourArt },
-  { name: "GPU", title: "Metal, Vulkan, Direct3D.", text: "The grade runs on the GPU of each system, and on the CPU when there is none.", Art: GpuArt },
-  { name: "Keyframes", title: "Animate any parameter.", text: "Keyframes on position, crop and other parameters.", Art: KeyframesArt },
-  { name: "Audio", title: "One graph for both.", text: "Playback and export run the same bus and effects graph.", Art: AudioArt },
-  { name: "Export", title: "MP4 or MOV with alpha.", text: "Preview and export use the same painter, so what you see is what renders.", Art: ExportArt },
+  { name: "Timeline", title: "Ripple, split, undo.", text: "Move, trim, split and ripple-delete. Undo still works after you close and reopen a project.", Art: TimelineArt },
+  { name: "Colour", title: "A full colour grade.", text: "Colour wheels, curves, LUTs and 18 looks and effects.", Art: ColourArt },
+  { name: "GPU", title: "Colour on the graphics card.", text: "Grading runs on your graphics card on every system, and still works on computers without one.", Art: GpuArt },
+  { name: "Keyframes", title: "Animate position, crop and more.", text: "Set keyframes by dragging on the canvas or in the timeline.", Art: KeyframesArt },
+  { name: "Audio", title: "Hear what you export.", text: "Playback and export use the same mix and the same audio effects.", Art: AudioArt },
+  { name: "Export", title: "MP4, or MOV with transparency.", text: "The export is drawn exactly like the preview, so what you see is what you get.", Art: ExportArt },
 ];
 
 export default function Features() {
@@ -28,7 +28,7 @@ export default function Features() {
           <h2 id="editing-title" className="h2">
             Every cut, <em>by hand</em>.
           </h2>
-          <p className={`lede ${styles.lede}`}>A timeline, a grade and an export that agree frame for frame.</p>
+          <p className={`lede ${styles.lede}`}>Cut on the timeline, grade the colour, export what you see.</p>
         </div>
         <div className={styles.grid}>
           {CARDS.map(({ name, title, text, Art }, i) => (

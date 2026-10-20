@@ -39,7 +39,7 @@ export function Footer() {
         <div className={`${styles.col} ${styles.brand}`}>
           <Mark size={28} title="oneTake" />
           <p className={styles.tagline}>A native video editor for macOS, Windows and Linux.</p>
-          <p className="mono dim">MIT OR APACHE-2.0 · ENGINES PREBUILT</p>
+          <p className="mono dim">OPEN SOURCE · MIT OR APACHE-2.0</p>
         </div>
         {COLUMNS.map((col) => (
           <nav key={col.heading} className={styles.col} aria-label={col.heading}>
@@ -63,7 +63,7 @@ export function Footer() {
       <div className={styles.bottomWrap}>
         <div className={`frame ${styles.bottom}`}>
           <span className="mono dim">© 2026 ARSHIYA RAHGOZAR</span>
-          <span className="mono dim">BUILT IN SWIFT</span>
+          <span className="mono dim">FREE · NO ACCOUNT</span>
         </div>
       </div>
     </footer>

@@ -31,7 +31,7 @@ export default function ExportArt() {
       <rect className={s.ink3} x={70} y={136} width={86} height={22} />
       <text className={s.label} x={113} y={149.5} textAnchor="middle">MP4 · H.264</text>
       <rect className={s.accent} x={164} y={136} width={86} height={22} />
-      <text className={s.label} x={207} y={149.5} textAnchor="middle">MOV · ALPHA</text>
+      <text className={s.label} x={207} y={149.5} textAnchor="middle">MOV</text>
     </Frame>
   );
 }

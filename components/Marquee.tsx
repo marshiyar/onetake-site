@@ -1,16 +1,16 @@
 import styles from "./Marquee.module.css";
 
 const ITEMS = [
-  "Ripple trim",
+  "Ripple edits",
   "Colour wheels",
   "Curves",
-  ".cube LUTs",
+  "LUTs",
   "Keyframes",
   "3D transforms",
   "Text layers",
-  "GPU grading",
-  "MOV with alpha",
-  "Undo across restarts",
+  "GPU colour",
+  "Transparent export",
+  "Undo after restart",
 ] as const;
 
 function Track({ hidden }: { hidden?: boolean }) {

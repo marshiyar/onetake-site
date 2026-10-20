@@ -6,15 +6,15 @@ import styles from "./Ownership.module.css";
 const ITEMS = [
   {
     letter: "A",
-    title: "Open source app",
-    body: "The editor is MIT or Apache-2.0 on GitHub. The media and keyframe engines ship prebuilt.",
+    title: "Open source",
+    body: "The editor's code is on GitHub under MIT or Apache-2.0. Its media engine ships as a closed, prebuilt part.",
     source: true,
   },
   { letter: "B", title: "No account", body: "Download, open, edit. Nothing to sign in to.", source: false },
   {
     letter: "C",
     title: "Plain project files",
-    body: "A project is a folder with one JSON document. Back it up, diff it, keep it.",
+    body: "A project is a normal folder on your disk. Copy it, back it up, keep it.",
     source: false,
   },
 ];
@@ -28,7 +28,7 @@ export function Ownership() {
           <h2 id="ownership-title" className="h2">
             Your work, <em>your machine</em>.
           </h2>
-          <p className="lede">No account, no subscription, nothing between you and your footage.</p>
+          <p className="lede">No account and no subscription. Your projects stay on your computer.</p>
         </div>
         <ul className={styles.grid}>
           {ITEMS.map((item) => (

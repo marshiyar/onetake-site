@@ -124,7 +124,7 @@ export default function Hero({ children }: { children?: ReactNode }) {
           Cut, grade, export. <em>Natively.</em>
         </p>
         <p className={`lede ${styles.lede}`}>
-          A video editor written in Swift for macOS, Windows and Linux. Its own media engine, no subscription.
+          A video editor for macOS, Windows and Linux. Free, with no account and no subscription.
         </p>
         <div className={styles.actions}>
           {children}
@@ -135,9 +135,9 @@ export default function Hero({ children }: { children?: ReactNode }) {
         <p className={`mono dim ${styles.meta}`}>
           <span>macOS · Windows · Linux</span>
           <span aria-hidden="true">·</span>
-          <span>Open source app</span>
+          <span>Free</span>
           <span aria-hidden="true">·</span>
-          <span>No FFmpeg</span>
+          <span>Open source</span>
         </p>
       </div>
     </section>

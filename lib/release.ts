@@ -3,7 +3,7 @@ import { REPO } from "./site";
 
 export type OS = "mac" | "windows" | "linux";
 
-export type AssetKind = "Disk image" | "Installer" | "Portable zip" | "Debian/Ubuntu package" | "Tarball";
+export type AssetKind = "Disk image (.dmg)" | "Installer (.exe)" | "Zip, no install" | "Ubuntu / Debian (.deb)" | "Archive (.tar.gz)";
 
 export interface ReleaseAsset {
   name: string;
@@ -36,15 +36,15 @@ interface Rule {
 }
 
 const RULES: Rule[] = [
-  { test: /-macos-arm64\.dmg$/i, os: "mac", kind: "Disk image", arch: "Apple silicon" },
-  { test: /-setup\.exe$/i, os: "windows", kind: "Installer", arch: "x64" },
-  { test: /-windows-x64-[^/]*\.zip$/i, os: "windows", kind: "Portable zip", arch: "x64" },
-  { test: /\.deb$/i, os: "linux", kind: "Debian/Ubuntu package", arch: "x64" },
-  { test: /-linux-x64-[^/]*\.tar\.gz$/i, os: "linux", kind: "Tarball", arch: "x64" },
+  { test: /-macos-arm64\.dmg$/i, os: "mac", kind: "Disk image (.dmg)", arch: "Apple silicon" },
+  { test: /-setup\.exe$/i, os: "windows", kind: "Installer (.exe)", arch: "x64" },
+  { test: /-windows-x64-[^/]*\.zip$/i, os: "windows", kind: "Zip, no install", arch: "x64" },
+  { test: /\.deb$/i, os: "linux", kind: "Ubuntu / Debian (.deb)", arch: "x64" },
+  { test: /-linux-x64-[^/]*\.tar\.gz$/i, os: "linux", kind: "Archive (.tar.gz)", arch: "x64" },
 ];
 
 /** The asset each OS's primary button points at. */
-const PRIMARY_KIND: Record<OS, AssetKind> = { mac: "Disk image", windows: "Installer", linux: "Debian/Ubuntu package" };
+const PRIMARY_KIND: Record<OS, AssetKind> = { mac: "Disk image (.dmg)", windows: "Installer (.exe)", linux: "Ubuntu / Debian (.deb)" };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
