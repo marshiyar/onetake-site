@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { OS_LABEL, detectOS, loadLatestRelease, primaryAsset, type OS, type ReleaseAsset } from "@/lib/release";
+import { OS_LABEL, detectOS, loadChannels, primaryAsset, type OS, type ReleaseAsset } from "@/lib/release";
 import styles from "./DownloadButton.module.css";
 
-type Target = { os: OS; asset: ReleaseAsset };
+type Target = { os: OS; asset: ReleaseAsset; nightly: boolean };
 
 export function DownloadGlyph() {
   return (
@@ -21,10 +21,12 @@ export function DownloadButton({ size = "md" }: { size?: "md" | "sm" }) {
     const os = detectOS(navigator.userAgent, navigator.platform);
     if (!os) return;
     let live = true;
-    loadLatestRelease()
-      .then((release) => {
-        const asset = primaryAsset(release, os);
-        if (live && asset) setTarget({ os, asset });
+    loadChannels()
+      .then(({ official, nightly }) => {
+        // The official release when there is one; the nightly build only when no official release exists yet.
+        const release = official ?? nightly;
+        const asset = release ? primaryAsset(release, os) : null;
+        if (live && asset) setTarget({ os, asset, nightly: !official });
       })
       // On failure the button keeps pointing at #download, where the error is shown.
       .catch(() => undefined);
@@ -45,7 +47,7 @@ export function DownloadButton({ size = "md" }: { size?: "md" | "sm" }) {
   return (
     <a className={cls} href={target.asset.url} title={target.asset.name}>
       <DownloadGlyph />
-      Download for {OS_LABEL[target.os]}
+      {target.nightly ? "Download nightly for" : "Download for"} {OS_LABEL[target.os]}
     </a>
   );
 }

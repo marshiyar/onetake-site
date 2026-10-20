@@ -1,4 +1,5 @@
-// The latest oneTake build on GitHub Releases: fetch it, keep only what a person can download, and say what each file is.
+// oneTake builds on GitHub Releases: fetch them, sort them into official releases and nightly builds, keep only what a person
+// can download, and say what each file is.
 import { REPO } from "./site";
 
 export type OS = "mac" | "windows" | "linux";
@@ -14,8 +15,14 @@ export interface ReleaseAsset {
   arch: string;
 }
 
+/** Official: a tested, numbered release (tag v1.2.3, not a prerelease). Nightly: a development build from main. */
+export type Channel = "official" | "nightly";
+
 export interface Release {
   tag: string;
+  prerelease: boolean;
+  /** Null for a release that is neither official nor nightly; such releases are never offered. */
+  channel: Channel | null;
   name: string;
   publishedAt: string;
   url: string;
@@ -24,7 +31,7 @@ export interface Release {
   ignored: string[];
 }
 
-export const LATEST_RELEASE_API = `https://api.github.com/repos/${REPO}/releases/latest`;
+export const RELEASES_API = `https://api.github.com/repos/${REPO}/releases?per_page=30`;
 
 export const OS_LABEL: Record<OS, string> = { mac: "macOS", windows: "Windows", linux: "Linux" };
 
@@ -61,6 +68,14 @@ export function classifyAsset(name: string): Omit<ReleaseAsset, "name" | "size" 
   return rule ? { os: rule.os, kind: rule.kind, arch: rule.arch } : null;
 }
 
+/** Which channel a release belongs to, from its tag and prerelease flag. */
+export function channelOf(release: Pick<Release, "tag" | "prerelease">): Channel | null {
+  if (/^v\d+\.\d+\.\d+/.test(release.tag)) return release.prerelease ? null : "official";
+  // build-main-<sha7> is the older name for a development build from main.
+  if (release.tag.startsWith("nightly-") || release.tag.startsWith("build-main-")) return "nightly";
+  return null;
+}
+
 export function parseRelease(json: unknown): Release {
   if (!isRecord(json)) throw new Error("Release JSON: expected an object.");
   const rawAssets = json.assets;
@@ -81,9 +96,13 @@ export function parseRelease(json: unknown): Release {
     assets.push({ name, size, url: str(raw, "browser_download_url"), ...cls });
   }
 
+  const tag = str(json, "tag_name");
+  const prerelease = json.prerelease === true;
   return {
-    tag: str(json, "tag_name"),
-    name: typeof json.name === "string" ? json.name : str(json, "tag_name"),
+    tag,
+    prerelease,
+    channel: channelOf({ tag, prerelease }),
+    name: typeof json.name === "string" && json.name !== "" ? json.name : tag,
     publishedAt: str(json, "published_at"),
     url: str(json, "html_url"),
     assets,
@@ -131,8 +150,12 @@ export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(d);
 }
 
-/** App version from the asset names ("0.1.0") and the build from the tag ("43d4bcf"). Either is null when absent. */
+/**
+ * Version and build for the summary line. Official: the version is the tag without "v" ("v0.2.0" → "0.2.0"), no build.
+ * Nightly and anything else: the version from the asset names ("0.1.0") and the build from the tag ("43d4bcf"). Null when absent.
+ */
 export function version(release: Release): { version: string | null; build: string | null } {
+  if (release.channel === "official") return { version: release.tag.replace(/^v/, ""), build: null };
   let v: string | null = null;
   for (const a of release.assets) {
     const m = /[-_](\d+\.\d+\.\d+)(?=[-_+])/.exec(a.name);
@@ -141,26 +164,50 @@ export function version(release: Release): { version: string | null; build: stri
       break;
     }
   }
-  const b = /([0-9a-f]{7,40})$/i.exec(release.tag);
+  const b = /-([0-9a-f]{7,40})$/i.exec(release.tag);
   return { version: v, build: b ? b[1] : null };
 }
 
-export async function fetchLatestRelease(fetchImpl: typeof fetch = fetch): Promise<Release> {
-  const res = await fetchImpl(LATEST_RELEASE_API, { headers: { Accept: "application/vnd.github+json" } });
-  if (!res.ok) throw new Error(`GitHub returned ${res.status} for the latest release.`);
+/** The newest 30 releases, newest first as GitHub returns them. Drafts are skipped. */
+export async function fetchReleases(fetchImpl: typeof fetch = fetch): Promise<Release[]> {
+  const res = await fetchImpl(RELEASES_API, { headers: { Accept: "application/vnd.github+json" } });
+  if (!res.ok) throw new Error(`GitHub returned ${res.status} for the list of releases.`);
   let json: unknown;
   try {
     json = await res.json();
   } catch {
-    throw new Error("GitHub returned a latest release that is not valid JSON.");
+    throw new Error("GitHub returned a list of releases that is not valid JSON.");
   }
-  return parseRelease(json);
+  if (!Array.isArray(json)) throw new Error("GitHub returned something other than a list of releases.");
+  return json.filter((r) => !(isRecord(r) && r.draft === true)).map(parseRelease);
 }
 
-let shared: Promise<Release> | null = null;
+export interface Channels {
+  official: Release | null;
+  nightly: Release | null;
+}
+
+function newer(a: Release, b: Release): boolean {
+  const ta = Date.parse(a.publishedAt);
+  const tb = Date.parse(b.publishedAt);
+  return (Number.isNaN(ta) ? -Infinity : ta) > (Number.isNaN(tb) ? -Infinity : tb);
+}
+
+/** The newest official release and the newest nightly build, by publish date. Either is null when there is none. */
+export function pickChannels(list: Release[]): Channels {
+  const out: Channels = { official: null, nightly: null };
+  for (const r of list) {
+    if (!r.channel) continue;
+    const current = out[r.channel];
+    if (!current || newer(r, current)) out[r.channel] = r;
+  }
+  return out;
+}
+
+let shared: Promise<Channels> | null = null;
 
 /** One request per page load, shared by every component that shows release data. */
-export function loadLatestRelease(): Promise<Release> {
-  if (!shared) shared = fetchLatestRelease((input, init) => fetch(input, init));
+export function loadChannels(): Promise<Channels> {
+  if (!shared) shared = fetchReleases((input, init) => fetch(input, init)).then(pickChannels);
   return shared;
 }

@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  LATEST_RELEASE_API,
+  RELEASES_API,
+  channelOf,
   detectOS,
-  fetchLatestRelease,
+  fetchReleases,
   formatDate,
   formatSize,
   parseRelease,
+  pickChannels,
   primaryAsset,
   version,
 } from "@/lib/release";
@@ -18,6 +20,7 @@ const LATEST = {
   tag_name: "build-main-43d4bcf",
   name: "MpVFX 2026-10-19 (main 43d4bcf)",
   published_at: "2026-10-19T22:33:50Z",
+  prerelease: false,
   html_url: "https://github.com/marshiyar/oneTake/releases/tag/build-main-43d4bcf",
   assets: [
     asset("MpVFX-0.1.0-macos-arm64.dmg", 6079789),
@@ -36,6 +39,8 @@ describe("parseRelease", () => {
 
   it("keeps the release metadata", () => {
     expect(r.tag).toBe("build-main-43d4bcf");
+    expect(r.prerelease).toBe(false);
+    expect(r.channel).toBe("nightly");
     expect(r.name).toBe("MpVFX 2026-10-19 (main 43d4bcf)");
     expect(r.publishedAt).toBe("2026-10-19T22:33:50Z");
     expect(r.url).toBe(LATEST.html_url);
@@ -108,25 +113,97 @@ describe("version", () => {
   });
 });
 
-describe("fetchLatestRelease", () => {
+describe("channelOf", () => {
+  it("treats a full v1.2.3 release as official", () => {
+    expect(channelOf({ tag: "v0.2.0", prerelease: false })).toBe("official");
+  });
+
+  it("ignores a v1.2.3 tag marked as a prerelease", () => {
+    expect(channelOf({ tag: "v0.2.0", prerelease: true })).toBeNull();
+  });
+
+  it("treats nightly-<sha> and the older build-main-<sha> as nightly", () => {
+    expect(channelOf({ tag: "nightly-abc1234", prerelease: true })).toBe("nightly");
+    expect(channelOf({ tag: "build-main-43d4bcf", prerelease: false })).toBe("nightly");
+  });
+
+  it("returns null for any other tag", () => {
+    expect(channelOf({ tag: "random", prerelease: false })).toBeNull();
+    expect(channelOf({ tag: "release-0.2.0", prerelease: false })).toBeNull();
+  });
+});
+
+const rel = (tag: string, published_at: string, prerelease: boolean) =>
+  parseRelease({ ...LATEST, tag_name: tag, name: tag, published_at, prerelease });
+
+describe("pickChannels", () => {
+  it("picks the newest release of each channel by publish date", () => {
+    const list = [
+      rel("nightly-aaaaaaa", "2026-10-20T03:00:00Z", true),
+      rel("v0.2.0", "2026-10-18T10:00:00Z", false),
+      rel("build-main-43d4bcf", "2026-10-19T22:33:50Z", false),
+      rel("v0.2.1", "2026-10-19T10:00:00Z", false),
+      rel("v0.3.0-rc1", "2026-10-20T10:00:00Z", true),
+      rel("random", "2026-10-21T10:00:00Z", false),
+    ];
+    const c = pickChannels(list);
+    expect(c.official?.tag).toBe("v0.2.1");
+    expect(c.nightly?.tag).toBe("nightly-aaaaaaa");
+  });
+
+  it("returns null for official when only development builds exist (today)", () => {
+    const c = pickChannels([parseRelease(LATEST)]);
+    expect(c.official).toBeNull();
+    expect(c.nightly?.tag).toBe("build-main-43d4bcf");
+  });
+
+  it("returns nulls for an empty list", () => {
+    expect(pickChannels([])).toEqual({ official: null, nightly: null });
+  });
+});
+
+describe("version by channel", () => {
+  it("uses the tag without v for an official release", () => {
+    expect(version(rel("v0.2.0", "2026-10-18T10:00:00Z", false))).toEqual({ version: "0.2.0", build: null });
+  });
+
+  it("uses the asset names and the tag sha for a nightly", () => {
+    expect(version(rel("nightly-abc1234", "2026-10-20T03:00:00Z", true))).toEqual({ version: "0.1.0", build: "abc1234" });
+  });
+});
+
+describe("fetchReleases", () => {
   const fakeFetch = (status: number, body: string): typeof fetch => {
     return async (input) => {
-      expect(String(input)).toBe(LATEST_RELEASE_API);
+      expect(String(input)).toBe(RELEASES_API);
       return new Response(body, { status, headers: { "Content-Type": "application/json" } });
     };
   };
 
-  it("parses a 200 response", async () => {
-    const r = await fetchLatestRelease(fakeFetch(200, JSON.stringify(LATEST)));
-    expect(r.assets).toHaveLength(5);
-    expect(r.tag).toBe("build-main-43d4bcf");
+  it("asks for 30 releases", () => {
+    expect(RELEASES_API).toBe("https://api.github.com/repos/marshiyar/oneTake/releases?per_page=30");
+  });
+
+  it("parses a 200 response and skips drafts", async () => {
+    const draft = { ...LATEST, tag_name: "v9.9.9", draft: true, published_at: null };
+    const list = await fetchReleases(fakeFetch(200, JSON.stringify([LATEST, draft])));
+    expect(list).toHaveLength(1);
+    expect(list[0].assets).toHaveLength(5);
+    expect(list[0].tag).toBe("build-main-43d4bcf");
+    expect(list[0].channel).toBe("nightly");
   });
 
   it("throws a clear error on 403 (rate limit)", async () => {
-    await expect(fetchLatestRelease(fakeFetch(403, '{"message":"API rate limit exceeded"}'))).rejects.toThrow("GitHub returned 403 for the latest release.");
+    await expect(fetchReleases(fakeFetch(403, '{"message":"API rate limit exceeded"}'))).rejects.toThrow(
+      "GitHub returned 403 for the list of releases.",
+    );
   });
 
   it("throws a clear error on bad JSON", async () => {
-    await expect(fetchLatestRelease(fakeFetch(200, "<html>"))).rejects.toThrow(/not valid JSON/);
+    await expect(fetchReleases(fakeFetch(200, "<html>"))).rejects.toThrow(/not valid JSON/);
+  });
+
+  it("throws a clear error when the JSON is not a list", async () => {
+    await expect(fetchReleases(fakeFetch(200, JSON.stringify(LATEST)))).rejects.toThrow(/not a list|other than a list/);
   });
 });
