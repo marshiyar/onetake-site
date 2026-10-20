@@ -1,0 +1,45 @@
+.footer { border-top: 1px solid var(--line); }
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+}
+
+.col {
+  padding: 32px var(--pad) 40px;
+  min-width: 0;
+}
+.col + .col { border-left: 1px solid var(--line); }
+
+.brand { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; color: var(--ink); }
+.brand p { margin: 0; }
+.tagline { font-size: 15px; line-height: 24px; color: var(--ink-2); max-width: 22em; }
+
+.heading { margin: 0 0 18px; font-size: 10px; }
+
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.link { font-size: 15px; line-height: 20px; color: var(--ink-2); transition: color 120ms ease; }
+.link:hover { color: var(--ink); }
+
+.bottomWrap { border-top: 1px solid var(--line); }
+.bottom {
+  min-height: var(--bar-h);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
+  padding: 10px var(--pad);
+}
+
+/* Two columns: brand spans the row, link columns sit below. */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .brand { grid-column: 1 / -1; border-bottom: 1px solid var(--line); }
+  .col + .col { border-left: 0; }
+  .col:nth-child(2n + 3) { border-left: 1px solid var(--line); }
+  .col:nth-child(4) { border-top: 1px solid var(--line); }
+}
+
+@media (max-width: 520px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .col:nth-child(2n + 3) { border-left: 0; }
+  .col + .col + .col { border-top: 1px solid var(--line); }
+  .col { padding-top: 24px; padding-bottom: 28px; }
+}

@@ -1,0 +1,6 @@
+.wrap { border-top: 1px solid var(--line); }
+.bar { gap: 16px; min-width: 0; }
+.label, .note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.slash { margin: 0 0.6em; }
+.note { text-align: right; flex-shrink: 1; }
+@media (max-width: 480px) { .note { display: none; } }

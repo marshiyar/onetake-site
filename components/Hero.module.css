@@ -1,0 +1,103 @@
+.hero {
+  position: relative;
+  min-height: 85vh;
+  min-height: 85svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--bg);
+  padding: calc(var(--pad) * 2) 16px;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  pointer-events: none;
+  fill: none;
+}
+
+.rings circle { stroke: var(--line); stroke-width: 1; opacity: 0.7; vector-effect: non-scaling-stroke; }
+
+.ticks { stroke: var(--ink-3); stroke-width: 6; stroke-dasharray: 1 24; opacity: 0.25; }
+
+.arc { stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.toneAccent { stroke: var(--accent); opacity: 0.5; }
+.toneWave { stroke: var(--wave); opacity: 0.4; }
+.toneVideo { stroke: var(--clip-video); opacity: 0.9; }
+.toneAudio { stroke: var(--clip-audio); opacity: 0.9; }
+
+.spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin 120s linear infinite;
+}
+
+.drifters { stroke: var(--ink-3); stroke-width: 1; opacity: 0.45; }
+.drifters * { vector-effect: non-scaling-stroke; }
+
+.drift { animation: drift 28s ease-in-out infinite alternate; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(var(--dx, 16px), var(--dy, 8px)); }
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 48% 42% at 50% 50%, color-mix(in srgb, var(--bg) 82%, transparent) 0%, transparent 100%),
+    linear-gradient(to bottom, transparent 70%, var(--bg) 100%);
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 100%;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(64px, 11vw, 150px);
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  color: var(--ink);
+}
+
+.tagline { margin-top: clamp(16px, 2.4vw, 28px); }
+
+.lede { margin-top: 16px; max-width: 34em; }
+
+.actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.meta {
+  margin: 28px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+}
+
+@media (max-width: 520px) {
+  .actions { flex-direction: column; align-items: stretch; width: 100%; max-width: 320px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin, .drift { animation: none !important; }
+}

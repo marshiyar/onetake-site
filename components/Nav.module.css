@@ -1,0 +1,72 @@
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  width: 100%; height: var(--nav-h);
+  display: flex; align-items: stretch;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.markCell {
+  flex: none; width: var(--nav-h); height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-right: 1px solid var(--line);
+  color: var(--ink);
+}
+.markCell:focus-visible { outline-offset: -2px; }
+
+.links {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 6px;
+  margin: 0; padding: 0 14px; list-style: none;
+}
+
+.link {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 8px;
+  color: var(--ink-2); white-space: nowrap;
+  transition: color 120ms ease, background 120ms ease;
+}
+.link:hover { color: var(--ink); }
+.link[data-active="true"] { background: var(--ink); color: var(--on-ink); }
+
+.right { flex: none; display: flex; align-items: stretch; margin-left: auto; }
+
+.cell {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; padding: 0;
+  border: 0; border-left: 1px solid var(--line); border-radius: 0;
+  background: transparent; color: var(--ink-2); cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+}
+.cell:hover { color: var(--ink); background: var(--bg-raised); }
+.cell:focus-visible { outline-offset: -2px; }
+.iconCell { width: var(--nav-h); }
+
+.menuBtn { display: none; padding: 0 16px; }
+
+.cta {
+  display: flex; align-items: center; justify-content: center;
+  height: calc(100% + 1px); padding: 0 28px;
+  background: var(--ink); color: var(--on-ink);
+  font-weight: 700;
+  transition: background 120ms ease;
+}
+.cta:hover { background: var(--ink-2); }
+.cta:focus-visible { outline-offset: -4px; outline-color: var(--accent); }
+
+@media (max-width: 759px) {
+  .menuBtn { display: flex; }
+  .cta { padding: 0 18px; }
+
+  .links {
+    display: none;
+    position: absolute; top: var(--nav-h); left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .links[data-open="true"] { display: flex; }
+  .links li + li { border-top: 1px solid var(--line); }
+  .link { display: flex; height: 52px; padding: 0 var(--pad); font-size: 12px; }
+  .link:focus-visible { outline-offset: -2px; }
+}
