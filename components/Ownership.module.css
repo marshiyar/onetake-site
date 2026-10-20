@@ -1,0 +1,14 @@
+
+.head { display: grid; gap: 20px; padding: clamp(48px, 8vw, 96px) var(--pad) clamp(48px, 8vw, 96px); }
+
+.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.cell { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-width: 0; padding: 40px 32px 48px; border-right: 1px solid var(--line); }
+.cell:last-child { border-right: 0; }
+.cell > :global(.h3) { margin-top: 24px; }
+.source { margin-top: 12px; }
+
+@media (max-width: 860px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .cell { padding: 32px var(--pad) 40px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .cell:last-child { border-bottom: 0; }
+}
