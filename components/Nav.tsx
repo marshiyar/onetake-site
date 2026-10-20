@@ -47,7 +47,7 @@ function useActiveSection(ids: readonly string[]): string | null {
   return active;
 }
 
-export default function Nav() {
+export function Nav() {
   const active = useActiveSection(SECTION_IDS);
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -134,3 +134,5 @@ export default function Nav() {
     </header>
   );
 }
+
+export default Nav;

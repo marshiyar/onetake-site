@@ -32,7 +32,7 @@ const COLUMNS: readonly FooterColumn[] = [
 
 const isExternal = (href: string) => /^https?:\/\//.test(href);
 
-export default function Footer() {
+export function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={`frame ${styles.grid}`}>
@@ -69,3 +69,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+export default Footer;

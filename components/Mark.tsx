@@ -6,7 +6,7 @@ type MarkProps = {
 };
 
 /** oneTake mark: a play triangle cut once by a diagonal slit (one take, one cut). */
-export default function Mark({ size = 22, className, title }: MarkProps) {
+export function Mark({ size = 22, className, title }: MarkProps) {
   return (
     <svg
       width={size}
@@ -24,3 +24,5 @@ export default function Mark({ size = 22, className, title }: MarkProps) {
     </svg>
   );
 }
+
+export default Mark;

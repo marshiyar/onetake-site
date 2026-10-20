@@ -1,0 +1,11 @@
+.section { border-top: 1px solid var(--line); }
+.inner {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  padding: clamp(88px, 14vw, 160px) var(--pad);
+  text-align: center;
+}
+.inner p { margin: 0; }
+.inner :global(.h2-xl) { font-family: var(--font-head); font-weight: 620; color: var(--ink); margin: 0; }
+.inner :global(.h2-xl) em { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.lede { max-width: 30em; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; max-width: 100%; }

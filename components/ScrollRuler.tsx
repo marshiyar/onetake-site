@@ -14,7 +14,7 @@ const pct = (p: number) => `${String(Math.round(p * 100)).padStart(3, "0")}%`;
  * Decorative right-edge ruler. The tick tape scrolls with the page and a thin accent marker tracks
  * scroll progress. Hidden below 1320px; static under prefers-reduced-motion.
  */
-export default function ScrollRuler() {
+export function ScrollRuler() {
   const [count, setCount] = useState(() => tickCountFor(1200));
   const [base, setBase] = useState(0); // tick index at the top of the tape
   const [motion, setMotion] = useState(false);
@@ -108,3 +108,5 @@ export default function ScrollRuler() {
     </div>
   );
 }
+
+export default ScrollRuler;
